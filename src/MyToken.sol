@@ -12,6 +12,13 @@ contract MyToken is ERC721, Ownable {
 
     constructor() ERC721("MyToken", "SBT") {}
 
+    address authority;
+
+    function setAuthority(address newAuthority) public {
+        require(msg.sender == authority || authority == address(0x0), "Only the authority can designate a new one");
+        authority = newAuthority;
+    }
+
     function safeMint(address to) public onlyOwner {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
@@ -19,7 +26,7 @@ contract MyToken is ERC721, Ownable {
     }
 
     function burn(uint256 tokenId) external {
-        require(ownerOf(tokenId) == msg.sender, "Only the owner of the token can burn it.");
+        require(ownerOf(tokenId) == msg.sender || msg.sender == authority, "Only the owner of the token can burn it.");
         _burn(tokenId);
     }
 

@@ -71,6 +71,7 @@ export async function createGanacheProvider(): Promise<{ tokenAddress: any | str
   await sbtContract.deployTransaction.wait()
   const tokenAddress = sbtContract.address
   const tokenABI = myToken.abi as ContractInterface
+  await (await sbtContract.setAuthority(await provider.getSigner(0).getAddress())).wait(0)
 
   return { provider, registry, tokenAddress, tokenABI }
 }

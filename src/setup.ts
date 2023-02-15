@@ -2,13 +2,14 @@ import { createAgent, ICredentialPlugin, IDataStore, IDIDManager, IKeyManager, I
 import { DIDResolverPlugin } from '@veramo/did-resolver'
 import { EthrDIDProvider } from '@veramo/did-provider-ethr'
 import {
-  DataStoreORM,
   DataStore,
+  DataStoreORM,
+  DIDStore,
   Entities,
-  migrations,
+  IDataStoreORM,
   KeyStore,
-  PrivateKeyStore,
-  DIDStore, IDataStoreORM
+  migrations,
+  PrivateKeyStore
 } from '@veramo/data-store'
 import { DIDManager } from '@veramo/did-manager'
 import { KeyManager } from '@veramo/key-manager'
@@ -21,7 +22,7 @@ import { getResolver as getEthrResolver } from 'ethr-did-resolver'
 import { createGanacheProvider } from './ganache-provider.js'
 
 import { EthrDidExtension, IEthrDidExtension } from '@spherity/did-extension-ethr'
-import { providers } from "ethers";
+import { ContractInterface, providers } from "ethers";
 
 const dbConnection = await new DataSource({
   type: 'sqlite',
@@ -35,7 +36,12 @@ const dbConnection = await new DataSource({
 const infuraProjectId = '3586660d179141e3801c3895de1c2eba'
 const secretBoxKey = 'e46a576aab80d7c817ca3e9b2916aabb67bc41bfd7f54a6af34d4eed2adbf9a3'
 
-export const { registry, provider, tokenAddress, tokenABI } = await createGanacheProvider()
+export const {
+  registry,
+  provider,
+  tokenAddress,
+  tokenABI
+}: { tokenAddress: any; registry: any; provider: providers.Web3Provider; tokenABI: ContractInterface } = await createGanacheProvider()
 
 export const defaultKms = 'local'
 const ganacheConfig = {
