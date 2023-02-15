@@ -7,11 +7,19 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@spherity/did-extension-ethr": "^1.0.2",
     "@veramo/core": "^5.0.0",
+    "@veramo/data-store": "^5.0.0",
+    "@veramo/did-manager": "^5.0.0",
+    "@veramo/did-provider-ethr": "^5.0.0",
     "@veramo/did-resolver": "^5.0.0",
+    "@veramo/key-manager": "^5.0.0",
+    "@veramo/kms-local": "^5.0.0",
     "ethers": "^5.7.0",
     "ethr-did-resolver": "^8.0.0",
-    "ganache": "^7.7.4"
+    "ganache": "^7.7.4",
+    "sqlite3": "^5.1.4",
+    "typeorm": "^0.3.12"
   },
   "files": [
     "./bin/*",
