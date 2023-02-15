@@ -23,7 +23,7 @@ export async function fundControllerAddress(provider: providers.Web3Provider, di
   const signer = await provider.getSigner(0)
   const fundingAddress = await signer.getAddress();
 
-  const userAddress = getControllerAddress(did)
+  const userAddress = await getControllerAddress(did)
 
   const tx = {
     from: fundingAddress,
