@@ -9,7 +9,9 @@
   "dependencies": {
     "@veramo/core": "^5.0.0",
     "@veramo/did-resolver": "^5.0.0",
-    "ethr-did-resolver": "^8.0.0"
+    "ethers": "^5.7.0",
+    "ethr-did-resolver": "^8.0.0",
+    "ganache": "^7.7.4"
   },
   "files": [
     "./bin/*",
@@ -23,6 +25,7 @@
     "prepublish": "npm run build"
   },
   "devDependencies": {
+    "@types/node": "^18.13.0",
     "ts-node": "^10.9.1",
     "tslint": "^6.1.3",
     "typescript": "^4.9.5"
