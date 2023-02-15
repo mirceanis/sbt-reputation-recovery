@@ -31,7 +31,8 @@
   "typings": "./lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node --esm src/index.ts",
+    "rep": "ts-node --esm src/recover-user-reputation.ts",
+    "did": "ts-node --esm src/recover-user-DID.ts",
     "lint": "tslint -c tslint.json src/**/*.ts",
     "prepublish": "npm run build"
   },

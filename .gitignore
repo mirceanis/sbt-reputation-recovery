@@ -3,3 +3,7 @@ lib
 
 .idea
 .DS_Store
+ganachedb/
+
+agent.yml
+localdb.sqlite

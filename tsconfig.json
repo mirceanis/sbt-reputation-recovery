@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "ESNext",
     "moduleResolution": "NodeNext",
     "rootDir": "src",
     "outDir": "lib",
@@ -12,7 +12,8 @@
     "experimentalDecorators": true,
     "downlevelIteration": true,
     "declaration": true,
-    "pretty": true
+    "pretty": true,
+    "resolveJsonModule": true
   },
   "include": [
     "typings/**/*",

@@ -21,6 +21,7 @@ import { getResolver as getEthrResolver } from 'ethr-did-resolver'
 import { createGanacheProvider } from './ganache-provider.js'
 
 import { EthrDidExtension, IEthrDidExtension } from '@spherity/did-extension-ethr'
+import { providers } from "ethers";
 
 const dbConnection = await new DataSource({
   type: 'sqlite',
@@ -34,7 +35,7 @@ const dbConnection = await new DataSource({
 const infuraProjectId = '3586660d179141e3801c3895de1c2eba'
 const secretBoxKey = 'e46a576aab80d7c817ca3e9b2916aabb67bc41bfd7f54a6af34d4eed2adbf9a3'
 
-export const { registry, provider } = await createGanacheProvider()
+export const { registry, provider, tokenAddress, tokenABI } = await createGanacheProvider()
 
 export const defaultKms = 'local'
 const ganacheConfig = {
@@ -44,7 +45,7 @@ const ganacheConfig = {
   registry
 }
 
-export const agent = createAgent<IResolver & IKeyManager & IDIDManager & IDataStore & IDataStoreORM & ICredentialPlugin>({
+export const agent = createAgent<IResolver & IKeyManager & IDIDManager & IDataStore & IDataStoreORM & ICredentialPlugin & IEthrDidExtension>({
   plugins: [
     new DIDResolverPlugin({
       ...getEthrResolver({

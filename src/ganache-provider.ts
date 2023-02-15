@@ -1,13 +1,14 @@
-import { Contract, ContractFactory, ethers, providers } from 'ethers'
+import { Contract, ContractFactory, ContractInterface, providers } from 'ethers'
 import { EthereumDIDRegistry } from 'ethr-did-resolver'
 import ganache from 'ganache'
+import myToken from './MyToken.json' assert { type: 'json' }
 
 /**
  * Creates a Web3Provider that connects to a local ganache instance with a bunch of known keys and an ERC1056 contract.
  *
  * This provider can only be used in a single test suite, because of some concurrency issues with ganache.
  */
-export async function createGanacheProvider(): Promise<{ provider: providers.Web3Provider; registry: string }> {
+export async function createGanacheProvider(): Promise<{ tokenAddress: any | string; registry: any | string; provider: providers.Web3Provider; tokenABI: ContractInterface }> {
   const provider = new providers.Web3Provider(
     ganache.provider({
       logging: { quiet: true },
@@ -59,13 +60,17 @@ export async function createGanacheProvider(): Promise<{ provider: providers.Web
   )
   await provider.ready
   const factory = ContractFactory.fromSolidity(EthereumDIDRegistry).connect(provider.getSigner(0))
-
   let registryContract: Contract = await factory.deploy()
   registryContract = await registryContract.deployed()
-
   await registryContract.deployTransaction.wait()
-
   const registry = registryContract.address
 
-  return { provider, registry }
+  // const sbtFactory = ContractFactory.fromSolidity(myToken).connect(provider.getSigner(0))
+  const sbtFactory = new ContractFactory(myToken.abi, myToken.data.bytecode.object, await provider.getSigner(0))
+  let sbtContract: Contract = await (await sbtFactory.deploy()).deployed()
+  await sbtContract.deployTransaction.wait()
+  const tokenAddress = sbtContract.address
+  const tokenABI = myToken.abi as ContractInterface
+
+  return { provider, registry, tokenAddress, tokenABI }
 }
