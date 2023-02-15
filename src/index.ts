@@ -1,83 +1,63 @@
-import { createAgent, IDataStore, IDIDManager, IKeyManager, IResolver } from '@veramo/core'
-import { DIDResolverPlugin } from '@veramo/did-resolver'
-import { EthrDIDProvider } from '@veramo/did-provider-ethr'
-import {
-  DataStoreORM,
-  DataStore,
-  Entities,
-  migrations,
-  KeyStore,
-  PrivateKeyStore,
-  DIDStore, IDataStoreORM
-} from '@veramo/data-store'
-import { DIDManager } from '@veramo/did-manager'
-import { KeyManager } from '@veramo/key-manager'
-import { KeyManagementSystem, SecretBox } from '@veramo/kms-local'
-import { DataSource } from 'typeorm'
+import { agent, defaultKms, provider } from './setup.js'
+import { IEthrDidExtension } from "@spherity/did-extension-ethr";
+import { TAgent } from "@veramo/core";
+import { ethers } from "ethers";
+import { getEthereumAddress } from "@veramo/utils";
 
-import { getResolver as getEthrResolver } from 'ethr-did-resolver'
-import { createGanacheProvider } from './ganache-provider.js'
+// issue a credential to the user; have the user rotate their keys, prove that the credential is still valid
 
-import { EthrDidExtension, IEthrDidExtension } from '@spherity/did-extension-ethr'
+const issuer = await agent.didManagerCreate({ provider: 'did:ethr:ganache' })
+const user = await agent.didManagerCreate({ provider: 'did:ethr:ganache' })
 
-const dbConnection = await new DataSource({
-  type: 'sqlite',
-  migrations,
-  migrationsRun: true,
-  entities: Entities,
-  database: 'localdb.sqlite',
-  synchronize: false
-}).initialize()
+const userDoc = await agent.resolveDid({ didUrl: user.did })
+const vm = await agent.getDIDComponentById({ didUrl: `${user.did}#controller`, didDocument: userDoc.didDocument! })
+const userAddress = getEthereumAddress(vm as any)
 
-const infuraProjectId = '3586660d179141e3801c3895de1c2eba'
-const secretBoxKey = 'e46a576aab80d7c817ca3e9b2916aabb67bc41bfd7f54a6af34d4eed2adbf9a3'
-
-const { registry, provider } = await createGanacheProvider()
-
-const defaultKms = 'local'
-const ganacheConfig = {
-  name: 'ganache',
-  chainId: 1337,
-  provider,
-  registry
-}
-
-const agent = createAgent<IResolver & IKeyManager & IDIDManager & IDataStore & IDataStoreORM & IEthrDidExtension>({
-  plugins: [
-    new DIDResolverPlugin({
-      ...getEthrResolver({
-        infuraProjectId,
-        networks: [ganacheConfig]
-      })
-    }),
-    new KeyManager({
-      store: new KeyStore(dbConnection),
-      kms: {
-        [defaultKms]: new KeyManagementSystem(new PrivateKeyStore(dbConnection, new SecretBox(secretBoxKey)))
-      }
-    }),
-    new DIDManager({
-      store: new DIDStore(dbConnection),
-      defaultProvider: 'did:ethr:ganache',
-      providers: {
-        'did:ethr:ganache': new EthrDIDProvider({
-          defaultKms,
-          networks: [ganacheConfig]
-        })
-      }
-    }),
-    new DataStore(dbConnection),
-    new DataStoreORM(dbConnection),
-    new EthrDidExtension({
-      store: new DIDStore(dbConnection) as any,
-      defaultKms,
-      networks: [ganacheConfig]
-    })
-  ]
+const credential = await agent.createVerifiableCredential({
+  credential: {
+    issuer: issuer.did,
+    type: ['SBTConnection'],
+    credentialSubject: {
+      id: user.did,
+      'hasSBT': true,
+    }
+  },
+  proofFormat: 'EthereumEip712Signature2021'
 })
 
-const myDID = await agent.didManagerGetOrCreate({alias: 'gigi'})
+console.log(credential);
 
-const resolved = await agent.resolveDid({ didUrl: myDID.did })
+const newUserKey = await agent.keyManagerCreate({
+  type: 'Secp256k1',
+  kms: defaultKms
+});
 
-console.log(resolved)
+const signer = await provider.getSigner(0)
+const fundingAddress = await signer.getAddress();
+
+const tx = {
+  from: fundingAddress,
+  to: userAddress,
+  value: ethers.utils.parseEther("0.1"),
+  nonce: provider.getTransactionCount(fundingAddress, "latest"),
+  gasLimit: 100000,
+};
+
+console.log('funding the controller')
+const ttx = await signer.sendTransaction(tx);
+await ttx.wait(0)
+console.log('done')
+
+console.dir((await agent.resolveDid({ didUrl: user.did })).didDocument, { depth: 10 })
+
+const change = await (agent as any as TAgent<IEthrDidExtension>).ethrChangeControllerKey({
+  did: user.did,
+  kid: newUserKey.kid,
+})
+
+console.log(change)
+console.dir((await agent.resolveDid({ didUrl: user.did })).didDocument, { depth: 10 })
+
+const verified = await agent.verifyCredential({credential})
+
+console.log(verified)

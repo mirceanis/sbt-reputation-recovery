@@ -1,4 +1,4 @@
-import { Contract, ContractFactory, providers } from 'ethers'
+import { Contract, ContractFactory, ethers, providers } from 'ethers'
 import { EthereumDIDRegistry } from 'ethr-did-resolver'
 import ganache from 'ganache'
 
@@ -11,6 +11,8 @@ export async function createGanacheProvider(): Promise<{ provider: providers.Web
   const provider = new providers.Web3Provider(
     ganache.provider({
       logging: { quiet: true },
+      deterministic: true,
+      db_path: './ganachedb',
       accounts: [
         {
           secretKey: '0x278a5de700e29faae8e40e366ec5012b5ec63d36ec77e8a2417154cc1d25383f',
@@ -64,5 +66,6 @@ export async function createGanacheProvider(): Promise<{ provider: providers.Web
   await registryContract.deployTransaction.wait()
 
   const registry = registryContract.address
+
   return { provider, registry }
 }
