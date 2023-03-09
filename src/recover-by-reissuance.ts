@@ -1,5 +1,5 @@
 import { agent, provider, tokenABI, tokenAddress } from './setup.js'
-import { getDIDAddress } from "./utils.js";
+import { getAddressFromDID } from "./utils.js";
 import { ethers } from "ethers";
 
 // mint SBTs to represent reputation;
@@ -16,7 +16,7 @@ const mySBT = new ethers.Contract(tokenAddress, tokenABI).connect(sbtIssuer)
 // create a user
 // this can be simply prepending `did:ethr:` to a known user address
 const user = await agent.didManagerCreate({ provider: 'did:ethr:ganache' })
-const originalUserAddress = getDIDAddress(user.did)
+const originalUserAddress = getAddressFromDID(user.did)
 console.log(`original user=${originalUserAddress}`)
 
 // mint some reputation
@@ -26,7 +26,7 @@ console.log(`original user was minted ${await mySBT.balanceOf(originalUserAddres
 
 // user creates a new address
 const newUser = await agent.didManagerCreate({ provider: 'did:ethr:ganache' })
-const newUserAddress = getDIDAddress(newUser.did)
+const newUserAddress = getAddressFromDID(newUser.did)
 console.log(`user creates a new address=${newUserAddress}`)
 
 // user signs a credential claiming ownership of the new address
@@ -46,8 +46,8 @@ console.log(credential);
 // Issuer checks user credential
 
 const { verified } = await agent.verifyCredential({ credential })
-const newAddress = getDIDAddress(credential.credentialSubject.id!)
-const oldAddress = getDIDAddress(credential.issuer as string)
+const newAddress = getAddressFromDID(credential.credentialSubject.id!)
+const oldAddress = getAddressFromDID(credential.issuer as string)
 const isCorrectType = (credential?.type as string[]).includes('SBTConnection')
 
 if (verified && isCorrectType) {

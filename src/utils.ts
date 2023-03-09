@@ -10,7 +10,7 @@ export async function getControllerAddress(did: string) {
   return userAddress;
 }
 
-export function getDIDAddress(did: string) {
+export function getAddressFromDID(did: string) {
   const publicKey = did.split(':').pop()!
   if (publicKey.length > 44) {
     return computeAddress(publicKey)

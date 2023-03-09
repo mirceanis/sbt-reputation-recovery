@@ -1,12 +1,12 @@
 import { agent, defaultKms, provider } from './setup.js'
-import { fundControllerAddress, getDIDAddress } from "./utils.js";
+import { fundControllerAddress, getAddressFromDID } from "./utils.js";
 
 // issue a credential to the user; have the user rotate their keys, prove that their reputation (credential) is still
 // valid
 
 const issuer = await agent.didManagerCreate({ provider: 'did:ethr:ganache' })
 const user = await agent.didManagerCreate({ provider: 'did:ethr:ganache' })
-const userAddress = getDIDAddress(user.did)
+const userAddress = getAddressFromDID(user.did)
 console.log(`user address=${userAddress}`)
 
 const credential = await agent.createVerifiableCredential({

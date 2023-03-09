@@ -33,6 +33,7 @@
     "build": "tsc",
     "reissuance": "ts-node --esm src/recover-by-reissuance.ts",
     "rotation": "ts-node --esm src/recover-by-key-rotation.ts",
+    "social": "ts-node --esm src/recover-by-social.ts",
     "lint": "tslint -c tslint.json src/**/*.ts",
     "prepublish": "npm run build"
   },
