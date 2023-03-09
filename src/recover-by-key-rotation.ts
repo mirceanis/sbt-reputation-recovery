@@ -1,7 +1,9 @@
 import { agent, defaultKms, provider } from './setup.js'
 import { fundControllerAddress, getAddressFromDID } from "./utils.js";
 
-// issue a credential to the user; have the user rotate their keys, prove that their reputation (credential) is still
+// In this sample, reputation is represented by a verifiable credential issued by an issuer.
+
+// Issue a credential to the user; have the user rotate their keys, prove that their reputation (credential) is still
 // valid
 
 const issuer = await agent.didManagerCreate({ provider: 'did:ethr:ganache' })

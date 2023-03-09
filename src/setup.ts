@@ -29,7 +29,7 @@ const dbConnection = await new DataSource({
   migrations,
   migrationsRun: true,
   entities: Entities,
-  database: 'localdb.sqlite',
+  database: ':memory:',
   synchronize: false
 }).initialize()
 

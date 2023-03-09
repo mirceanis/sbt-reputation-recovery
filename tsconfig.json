@@ -13,7 +13,8 @@
     "downlevelIteration": true,
     "declaration": true,
     "pretty": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": [
     "typings/**/*",
